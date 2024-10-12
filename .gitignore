@@ -30,3 +30,13 @@
 *.exe
 *.out
 *.app
+
+# Apple Stuff
+*.DS_Store
+
+# CMake Output 
+/out
+
+
+# VSCode settings
+*.vscode
