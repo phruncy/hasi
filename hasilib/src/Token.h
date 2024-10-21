@@ -1,6 +1,11 @@
 #pragma once
 
 #include <string>
+#include <cfloat>
+
+typedef float TokenValue;
+
+constexpr TokenValue HASI_NOVALUE = FLT_MAX;
 
 namespace hasi
 {
@@ -17,7 +22,7 @@ namespace hasi
         EQUAL,
         EQUAL_EQUAL,
         GREATER,
-        GREATER_EQUALm,
+        GREATER_EQUAL,
         LESS,
         LESS_EQUAL,
         BANG,
@@ -29,16 +34,11 @@ namespace hasi
         NUMBER,
         IDENTIFIER
     };
-
-    struct TokenValue
-    {
-        float literal = 0;
-    };
     
     struct Token
     {
         TokenType type;
         std::string lexeme;
-        TokenValue value = null;
+        TokenValue value;
     };
 }

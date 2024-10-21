@@ -72,8 +72,8 @@ TOKEN :
     BANG = '!'|
     BANG_EQUAL = '!='|
 
-    COND_OR = '||'|
-    COND_AND = '&&'|
+    COND_OR = 'or'|
+    COND_AND = 'and'|
 
     QUESTION = '?'|
     COLON = ':'|
