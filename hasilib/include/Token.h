@@ -27,6 +27,7 @@ namespace hasi
         LESS_EQUAL,
         BANG,
         BANG_EQUAL,
+        COMMA,
 
         CONDITIONAL_OR,
         CONDITIONAL_AND,

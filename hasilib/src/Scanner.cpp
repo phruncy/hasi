@@ -1,4 +1,4 @@
-#include "Scanner.h"
+#include <Scanner.h>
 #include "hasi_error.h"
 #include "keywords.h"
 
@@ -9,14 +9,14 @@ namespace hasi
     void Scanner::scan()
     {
         _tokens = std::vector<Token>();
-        while (!isAtEnd())
+        while (!isAtEnd() && !_hadError)
         {
             _start = _current;
             scanToken();
         }
     }
 
-    bool Scanner::isAtEnd()
+    bool Scanner::isAtEnd() const
     {
         return _current >= _source.size();
     }
@@ -44,6 +44,9 @@ namespace hasi
             case ')':
                 addToken(TokenType::RIGHT_PAREN, HASI_NOVALUE);
                 break;
+            case ',':
+                addToken(TokenType::COMMA, HASI_NOVALUE);
+                break;
             case '=':
                 addToken(match('=') ? TokenType::EQUAL_EQUAL : TokenType::EQUAL, HASI_NOVALUE);
                 break;
@@ -56,30 +59,30 @@ namespace hasi
             case '!':
                 addToken(match('=') ? TokenType::BANG_EQUAL : TokenType::BANG, HASI_NOVALUE);
                 break;
-
+            case '\n':
+                ++_line;
+                break;
             // ignore these characters
             case ' ':
             case '\r':
-            case '\n':
                 break;
             //identifiers
             default:
                 if(isdigit(c)) addNumber();
-                if(isalpha(c)) addIdentifier();
+                else if(isalpha(c)) addIdentifier();
                 else 
                 {
-                    string message = "Unexpected token " + c;
-                    hasi_error::report("Scanner", message);
+                    string message = string("Unexpected token ").append(1, c);
+                    hasi_error::report("Scanner", message, _line);
                     _hadError = true;
                 }
-                break;
         }
 
     }
 
     char Scanner::advance()
     {
-        return _source[++_current];
+        return _source[_current++];
     }
 
     bool Scanner::match(char expected)
@@ -95,7 +98,7 @@ namespace hasi
     void Scanner::addToken(TokenType type, TokenValue value)
     {
         string lexeme = _source.substr(_start, _current);
-        _tokens.emplace_back(type, lexeme, value);
+        _tokens.push_back({type, lexeme, value});
     }
 
     void Scanner::addNumber()
@@ -122,18 +125,18 @@ namespace hasi
             advance();
         }
         string lexeme = _source.substr(_start, _current);
-        TokenType type = 0;
-        addToken(type, lexeme);
+        TokenType type = keywords.contains(lexeme) ? keywords.at(lexeme) : TokenType::IDENTIFIER;
+        addToken(type, HASI_NOVALUE);
     }
 
-    char Scanner::peek()
+    char Scanner::peek() const
     {
         if(isAtEnd())
             return '\0';
         return _source.at(_current);
     }
 
-    char Scanner::peekNext()
+    char Scanner::peekNext() const
     {
         if(_current + 1 >= _source.size())
         {
